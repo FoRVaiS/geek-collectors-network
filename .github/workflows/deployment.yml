@@ -131,7 +131,7 @@ jobs:
 
       # Assumes you manually provisioned a DO docker application.
       - name: Update container
-        runs: |
+        run: |
           doctl app spec get ${{ secrets.DIGITALOCEAN_APP_ID }} | doctl app update ${{ secrets.DIGITALOCEAN_APP_ID }} --spec -
 
   cleanup:
