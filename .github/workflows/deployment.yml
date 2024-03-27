@@ -1,5 +1,5 @@
 ---
-name: Docker
+name: Deployment
 
 on:
   push: # Canary builds
@@ -116,6 +116,23 @@ jobs:
           image: ${{ env.REGISTRY }}/${{ env.OWNER_LC }}/${{ matrix.project }}:${{ env.VERSION }}
         run: |
           docker push ${{ env.image }}
+
+  deployment:
+    needs: [build, push]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout files
+        uses: actions/checkout@v2
+
+      - name: Instal doctl
+        uses: digitalocaen/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      # Assumes you manually provisioned a DO docker application.
+      - name: Update container
+        runs: |
+          doctl app spec get ${{ secrets.DIGITALOCEAN_APP_ID }} | doctl app update ${{ secrets.DIGITALOCEAN_APP_ID }} --spec -
 
   cleanup:
     name: cleanup
